@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net.Http;
-using System.Net.NetworkInformation;
+using System.Net;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -43,20 +43,23 @@ namespace TWallet.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            GetCreditsFromDatabase();
-
-            if (IsInternetAvailable())
-            {
-            	SetDatabaseWithCurrencies();
-            }
-            else
-            {
-            	GetCurrenciesFromDatabase();
-            }
-
+            prepareCurrencies();
         }
 
-        async void GetCreditsFromDatabase()
+        async void prepareCurrencies()
+        {
+            await GetCreditsFromDatabase();
+			if (IsInternetAvailable())
+			{
+				SetDatabaseWithCurrencies();
+			}
+			else
+			{
+				GetCurrenciesFromDatabase();
+			}
+        }
+
+        async Task GetCreditsFromDatabase()
         {
             account = await App.Database.GetCredits();
             if (account == null) 
@@ -115,28 +118,35 @@ namespace TWallet.Views
 
 		string ConvertTo(double currency, string toType)
 		{
-			double rate = rootCurrency.rates[toType];
-			double result = currency * rate;
-			return result + " " + toType;
+            if (rootCurrency.rates.ContainsKey(toType))
+            {
+                double rate = rootCurrency.rates[toType];
+                double result = currency * rate;
+                return result + " " + toType;
+            }
+            return "";
 		}
 
 		bool IsInternetAvailable()
 		{
+			string CheckUrl = "http://google.com";
+
 			try
 			{
-				Ping ping = new Ping();
-				string host = "google.pt";
-				byte[] buffer = new byte[32];
-				int timeout = 500;
+				HttpWebRequest iNetRequest = (HttpWebRequest)WebRequest.Create(CheckUrl);
 
-				PingOptions opts = new PingOptions();
-				PingReply reply = ping.Send(host, timeout, buffer, opts);
+				iNetRequest.Timeout = 5000;
+
+				WebResponse iNetResponse = iNetRequest.GetResponse();
+
+				iNetResponse.Close();
 
 				return true;
+
 			}
-			catch (Exception ex)
+			catch (WebException)
 			{
-				return false;
+                return false;
 			}
 		}
 	}
