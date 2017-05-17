@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TWallet.Modals.AddCurrency">
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness" iOS="0,40,0,0" />
+    </ContentPage.Padding>
+    <ContentPage.Content>
+        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Name:" FontSize="Medium" HorizontalOptions="FillAndExpand" />
+            </StackLayout>
+            <Picker x:Name="currency_picker" Title="Picker(Combo Demo)">  
+                <Picker.Items>  
+                    <x:String> Apple </x:String>  
+                    <x:String> Banana </x:String>  
+                    <x:String> Cherry </x:String>  
+                </Picker.Items>  
+            </Picker>  
+            <Button x:Name="dismissButton" Text="Dismiss" Clicked="OnDismissButtonClicked" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
