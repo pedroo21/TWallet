@@ -7,42 +7,71 @@ namespace TWallet.Modals
 {
 	public partial class AddCurrency : ContentPage
 	{
+        Picker picker;
+        List<Currency> currencies;
+
 		public AddCurrency()
 		{
 			InitializeComponent();
 			InitializeLayout();
+            InitializeData();
 		}
 
 		void InitializeLayout()
 		{
-			Picker picker = this.FindByName<Picker>("currency_picker");
+			picker = this.FindByName<Picker>("currency_picker");
 		}
 
-		async void OnDismissButtonClicked(object sender, EventArgs args)
+        async void InitializeData() {
+            currencies = await App.Database.GetItemsAsync();
+            currencies.Add(new Currency() 
+            {
+                CurrencyDescription = "EUR",
+                CurrencyValue = 1.0000000
+            });
+            picker.ItemsSource = currencies;
+        }
+
+		async void OnTopUpClicked(object sender, EventArgs args)
 		{
+            Currency currency = (Currency) picker.SelectedItem;
+
+            if (currency != null)
+            {
+				if (Double.TryParse(this.ammount.Text, out double ammount))
+				{
+                    double exchangeRateToEur = 1 / currency.CurrencyValue;
+                    double ammountToAdd = ammount * exchangeRateToEur;
+
+                    Account account = await App.Database.GetCredits();
+                    account.CreditsDb += ammountToAdd;
+
+                    await App.Database.UpdateCredits(account);
+				}
+            }
+
+            await Navigation.PopModalAsync();
+		}
+
+		async void OnTopDownClicked(object sender, EventArgs args)
+		{
+			Currency currency = (Currency)picker.SelectedItem;
+
+			if (currency != null)
+			{
+				if (Double.TryParse(this.ammount.Text, out double ammount))
+				{
+					double exchangeRateToEur = 1 / currency.CurrencyValue;
+					double ammountToRemove = ammount * exchangeRateToEur;
+
+					Account account = await App.Database.GetCredits();
+                    account.CreditsDb -= ammountToRemove;
+
+					await App.Database.UpdateCredits(account);
+				}
+			}
+
 			await Navigation.PopModalAsync();
 		}
-
-		//void OnAddTapped(object sender, System.EventArgs e)
-		//{
-		//    if (Double.TryParse(this.entry_add.Text, out double currencyToAdd))
-		//    {
-		//        account.CreditsDb += currencyToAdd;
-		//        App.Database.UpdateCredits(account);
-		//        this.currencies.Clear();
-		//        GetCurrenciesFromDatabase();
-		//    }
-		//}
-
-		//void OnRemoveTapped(object sender, System.EventArgs e)
-		//{
-		//    if (Double.TryParse(this.entry_remove.Text, out double currencyToRemove))
-		//    {
-		//        account.CreditsDb -= currencyToRemove;
-		//        App.Database.UpdateCredits(account);
-		//        this.currencies.Clear();
-		//        GetCurrenciesFromDatabase();
-		//    }
-		//}
 	}
 }

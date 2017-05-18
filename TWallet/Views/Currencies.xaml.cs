@@ -43,6 +43,7 @@ namespace TWallet.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
+            this.currencies.Clear();
             prepareCurrencies();
         }
 
@@ -107,8 +108,7 @@ namespace TWallet.Views
 
 		void Populate()
 		{
-
-			prices[0] = account.CreditsDb.ToString() + " €";
+			prices[0] = account.CreditsDb.ToString("0.00") + " €";
 			prices[1] = ConvertTo(account.CreditsDb, CurrencyEnum.USD);
 			prices[2] = ConvertTo(account.CreditsDb, CurrencyEnum.GBP);
 			prices[3] = ConvertTo(account.CreditsDb, CurrencyEnum.JPY);
@@ -122,7 +122,7 @@ namespace TWallet.Views
             {
                 double rate = rootCurrency.rates[toType];
                 double result = currency * rate;
-                return result + " " + toType;
+                return result.ToString("0.00") + " " + toType;
             }
             return "";
 		}
