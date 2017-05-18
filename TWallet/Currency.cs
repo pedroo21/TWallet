@@ -26,7 +26,7 @@ namespace TWallet
 			this.CurrencyValue = currValue;
 			this.CurrencyDescription = currDesc;
 			double wallet = credits;
-			this.CurrencyConverted = (wallet * currValue).ToString();
+			this.CurrencyConverted = (wallet * currValue).ToString("0.000");
 			SetImage();
 		}
 
