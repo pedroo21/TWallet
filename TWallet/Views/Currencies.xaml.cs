@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using TWallet.API;
 using TWallet.Models;
 using TWallet.Modals;
+using TWallet.Util;
 
 using Xamarin.Forms;
 
@@ -17,18 +18,18 @@ namespace TWallet.Views
 {
 	public partial class Currencies : ContentPage
 	{
-		string[] prices = new string[5];
-		static int pos;
-		Account account;
-		ObservableCollection<Currency> currencies = new ObservableCollection<Currency>();
-		Root rootCurrency;
+        private ListView list;
+        private ObservableCollection<Credit> credits = new ObservableCollection<Credit>();
+        private Account account;
+
+        private double cashDisplay;
 
 		public Currencies()
 		{
 			InitializeComponent();
 			InitializeLayout();
 
-			pos = 0;
+            this.list = this.FindByName<ListView>("currency_list");
 		}
 
 		void InitializeLayout()
@@ -43,86 +44,83 @@ namespace TWallet.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            this.currencies.Clear();
-            prepareCurrencies();
+            CurrencyManager.ClearCurrencies();
+            this.credits.Clear();
+            PrepareCurrencies();
         }
 
-        async void prepareCurrencies()
+        // Initialize the listing
+        async void PrepareCurrencies()
         {
-            await GetCreditsFromDatabase();
-			if (IsInternetAvailable())
+            account = await App.Database.GetAccount();
+			if (account.Credits.Count == 0)
 			{
-				SetDatabaseWithCurrencies();
+				list.IsVisible = false;
+				Label total = this.FindByName<Label>("cash");
+				total.Text = "Empty";
 			}
-			else
-			{
-				GetCurrenciesFromDatabase();
-			}
-        }
-
-        async Task GetCreditsFromDatabase()
-        {
-            account = await App.Database.GetCredits();
-            if (account == null) 
-            {
-                await App.Database.CreateCredits(new Account(){ CreditsDb = 100 });
-                account = await App.Database.GetCredits();
+            else {
+                list.IsVisible = true;
+				Label empty = this.FindByName<Label>("cash_empty");
+				empty.IsVisible = false;
             }
+            if (IsInternetAvailable())
+            {
+                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+            }
+            GetCurrenciesFromDatabase();
         }
 
-		async void SetDatabaseWithCurrencies()
+        // Double tap gesture on the wallet total
+		async void OnTapGesture(object sender, EventArgs e)
 		{
-			await App.Database.SaveCurrenciesToDatabase();
-			GetCurrenciesFromDatabase();
+            Currency cur = CurrencyManager.MoveNext(account.RootCurrency);
+            if (cur != null)
+            {
+                account.RootCurrency = cur.CurrencyKey;
+                await App.Database.InsertOrReplaceAccount(account);
+            }
+            OnAppearing();
 		}
 
-		void OnTapGesture(object sender, EventArgs e)
-		{
-			if (pos > prices.Length - 1) { pos = 0; }
-			this.cash.Text = prices[pos];
-			pos++;
-		}
-
+        // Get all cached currencies from the database
 		async void GetCurrenciesFromDatabase()
 		{
-			List<Currency> currenciesFromDatabase = await App.Database.GetItemsAsync();
-			rootCurrency = new Root()
+            await CurrencyManager.Init();
+			foreach (var item in account.Credits)
 			{
-				rates = new Dictionary<string, double>()
-			};
-			foreach (var item in currenciesFromDatabase)
-			{
-				this.currencies.Add(new Currency(item.CurrencyDescription, item.CurrencyValue, account.CreditsDb));
-				this.rootCurrency.rates.Add(item.CurrencyDescription, item.CurrencyValue);
+				this.credits.Add(item);
 			}
-			SetCurrencyListItems();
-			Populate();
-		}
-
-		void SetCurrencyListItems()
-		{
-			this.currency_list.ItemsSource = this.currencies;
+            this.currency_list.ItemsSource = this.credits;
+            this.currency_list.HasUnevenRows = true;
+			CalculateRates();
 		}
 
 		/* Helper */
 
-		void Populate()
+		void CalculateRates()
 		{
-			prices[0] = account.CreditsDb.ToString("0.00") + " €";
-			prices[1] = ConvertTo(account.CreditsDb, CurrencyEnum.USD);
-			prices[2] = ConvertTo(account.CreditsDb, CurrencyEnum.GBP);
-			prices[3] = ConvertTo(account.CreditsDb, CurrencyEnum.JPY);
-			prices[4] = ConvertTo(account.CreditsDb, CurrencyEnum.CAD);
-			this.cash.Text = prices[pos];
+            double total = 0;
+            foreach (var credit in account.Credits) 
+            {
+                Currency currency = credit.GetCurrency();
+                if (currency != null)
+                {
+                    double exchangeRate = 1 / currency.CurrencyValue;
+                    total += credit.Amount * exchangeRate;
+                }
+            }
+            this.cashDisplay = total;
+            this.cash.Text = cashDisplay.ToString("0.00 ") + account.RootCurrency;
 		}
 
 		string ConvertTo(double currency, string toType)
 		{
-            if (rootCurrency.rates.ContainsKey(toType))
+            if (CurrencyManager.GetCurrency(toType) != null)
             {
-                double rate = rootCurrency.rates[toType];
+                double rate = CurrencyManager.GetCurrency(toType).CurrencyValue;
                 double result = currency * rate;
-                return result.ToString("0.00") + " " + toType;
+                return result.ToString("0.00 ") + toType;
             }
             return "";
 		}

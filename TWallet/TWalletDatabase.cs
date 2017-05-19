@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using SQLite;
 using TWallet.API;
 using TWallet.Models;
+using TWallet.Util;
 
 namespace TWallet
 {
@@ -15,52 +16,67 @@ namespace TWallet
 
 		public TWalletDatabase(string dbPath)
 		{
-			database = new SQLiteAsyncConnection(dbPath);
-			database.CreateTableAsync<Currency>().Wait();
-			database.CreateTableAsync<Account>().Wait();
+            database = new SQLiteAsyncConnection(dbPath);
+            database.CreateTableAsync<Currency>();
+            database.CreateTableAsync<Account>();
+            database.CreateTableAsync<Credit>();
 		}
 
-		public Task<Account> GetCredits()
+		public async Task<Account> GetAccount()
 		{
-			return database.Table<Account>().FirstOrDefaultAsync();
+            Account account = await database.Table<Account>().FirstOrDefaultAsync();
+            if(account == null) {
+                account = new Account(CurrencyEnum.EUR);
+                account.Id = await App.Database.InsertOrReplaceAccount(account);
+            }
+            account.Credits = await GetCredits();
+            return account;
 		}
 
-		public Task<int> CreateCredits(Account account)
+        public async Task<int> InsertOrReplaceAccount(Account account)
 		{
-			return database.InsertAsync(account);
+			return await database.InsertOrReplaceAsync(account);
 		}
 
-		public Task<int> UpdateCredits(Account account)
+        public async Task<List<Credit>> GetCredits()
+        {
+            return await database.Table<Credit>().ToListAsync();
+        }
+
+        public async Task UpdateCredits(List<Credit> credits)
 		{
-			return database.UpdateAsync(account);
+            foreach (var credit in credits)
+            {
+                await database.InsertOrReplaceAsync(credit);
+            }
 		}
 
-		public Task<List<Currency>> GetItemsAsync()
+		public async Task<List<Currency>> GetCurrencies()
 		{
-			return database.Table<Currency>().ToListAsync();
+            return await database.Table<Currency>().ToListAsync();
 		}
 
-		public Task<int> SaveItemAsync(Currency currency)
+		public async Task<int> SaveCurrencies(Currency currency)
 		{
-			return database.InsertOrReplaceAsync(currency);
+			return await database.InsertOrReplaceAsync(currency);
 		}
 
-		public Task DeleteAllItems()
+		public async Task<List<Currency>> DeleteAllCurrencies()
 		{
-			return database.QueryAsync<Currency>("delete from Currency");
+            return await database.QueryAsync<Currency>("delete from Currency");
 		}
 
-		public async Task SaveCurrenciesToDatabase()
+		public async Task SaveCurrenciesToDatabase(string currency)
 		{
 			HttpClientHandler handler = new HttpClientHandler();
-			HttpResponseMessage response = await APIHandler.Get("http://api.fixer.io/latest", handler);
+			HttpResponseMessage response = await APIHandler.Get("http://api.fixer.io/latest?base=" + currency, handler);
 			if (response.IsSuccessStatusCode)
 			{
 				Root rootCurrency = JsonConvert.DeserializeObject<Root>(await response.Content.ReadAsStringAsync());
 				foreach (var item in rootCurrency.rates)
 				{
-					Currency curr = new Currency(item.Key, item.Value);
-					await App.Database.SaveItemAsync(curr);
+                    Currency curr = new Currency(item.Key, item.Value);
+					await App.Database.SaveCurrencies(curr);
 					curr = null;
 				}
 			}

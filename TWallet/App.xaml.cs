@@ -4,7 +4,8 @@ namespace TWallet
 {
 	public partial class App : Application
 	{
-		static TWalletDatabase database = new TWalletDatabase(DependencyService.Get<IFileHelper>().GetLocalFilePath("TWalletSQLite.db3"));
+		static TWalletDatabase database = new TWalletDatabase(
+            DependencyService.Get<IFileHelper>().GetLocalFilePath("TWalletSQLite.db3"));
 
 		public App()
 		{
@@ -19,7 +20,8 @@ namespace TWallet
 			{
 				if (database == null)
 				{
-					database = new TWalletDatabase(DependencyService.Get<IFileHelper>().GetLocalFilePath("TWalletSQLite.db3"));
+					database = new TWalletDatabase(
+                        DependencyService.Get<IFileHelper>().GetLocalFilePath("TWalletSQLite.db3"));
 				}
 				return database;
 			}

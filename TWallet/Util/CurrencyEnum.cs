@@ -10,6 +10,6 @@ namespace TWallet.Models
 			JPY = "JPY", KRW = "KRW", MXN = "MXN", MYR = "MYR", NOK = "NOK",
 			NZD = "NZD", PHP = "PHP", PLN = "PLN", RON = "RON", RUB = "RUB",
 			SEK = "SEK", SGD = "SGD", THB = "THB", TRY = "TRY", USD = "USD",
-			ZAR = "ZAR";
+			ZAR = "ZAR", EUR = "EUR";
 	}
 }

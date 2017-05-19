@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 using Xamarin.Forms;
 
+using TWallet.Models;
+
 namespace TWallet.Modals
 {
 	public partial class AddCurrency : ContentPage
 	{
         Picker picker;
-        List<Currency> currencies;
 
 		public AddCurrency()
 		{
@@ -22,11 +23,11 @@ namespace TWallet.Modals
 			picker = this.FindByName<Picker>("currency_picker");
 		}
 
-        async void InitializeData() {
-            currencies = await App.Database.GetItemsAsync();
+        void InitializeData() {
+            List<Currency> currencies = CurrencyManager.GetCurrencies();
             currencies.Add(new Currency() 
             {
-                CurrencyDescription = "EUR",
+                CurrencyKey = "EUR",
                 CurrencyValue = 1.0000000
             });
             picker.ItemsSource = currencies;
@@ -40,13 +41,13 @@ namespace TWallet.Modals
             {
 				if (Double.TryParse(this.ammount.Text, out double ammount))
 				{
-                    double exchangeRateToEur = 1 / currency.CurrencyValue;
-                    double ammountToAdd = ammount * exchangeRateToEur;
+                    //double exchangeRateToEur = 1 / currency.CurrencyValue;
+                    //double ammountToAdd = ammount * exchangeRateToEur;
 
-                    Account account = await App.Database.GetCredits();
-                    account.CreditsDb += ammountToAdd;
+                    Account account = await App.Database.GetAccount();
+                    account.AddCredits(currency.CurrencyKey, ammount);
 
-                    await App.Database.UpdateCredits(account);
+                    App.Database.UpdateCredits(account.Credits);
 				}
             }
 
@@ -64,14 +65,19 @@ namespace TWallet.Modals
 					double exchangeRateToEur = 1 / currency.CurrencyValue;
 					double ammountToRemove = ammount * exchangeRateToEur;
 
-					Account account = await App.Database.GetCredits();
-                    account.CreditsDb -= ammountToRemove;
+					Account account = await App.Database.GetAccount();
+                    //account.CreditsDb -= ammountToRemove;
 
-					await App.Database.UpdateCredits(account);
+					App.Database.UpdateCredits(account.Credits);
 				}
 			}
 
 			await Navigation.PopModalAsync();
 		}
+
+        async void OnDismiss(object sender, EventArgs args)
+        {
+            await Navigation.PopModalAsync();
+        }
 	}
 }

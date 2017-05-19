@@ -3,20 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TWallet.Modals.AddCurrency">
     <ContentPage.Padding>
-        <OnPlatform x:TypeArguments="Thickness" iOS="0,40,0,0" />
+        <OnPlatform x:TypeArguments="Thickness" iOS="20,40,20,20" Android="20,20,20,20" />
     </ContentPage.Padding>
     <ContentPage.Content>
-        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+        <StackLayout VerticalOptions="CenterAndExpand">
             <StackLayout Orientation="Horizontal">
                 <Label Text="Currency" FontSize="Medium" HorizontalOptions="FillAndExpand" />
             </StackLayout>
-            <Picker x:Name="currency_picker" Title="Pick currency" ItemDisplayBinding="{Binding CurrencyDescription}" />  
-            <StackLayout Orientation="Vertical">
+            <Picker x:Name="currency_picker" Title="Pick currency" ItemDisplayBinding="{Binding CurrencyKey}" />  
+            <StackLayout Orientation="Vertical" Margin="0, 20, 0, 0">
                 <Label Text="Amount" FontSize="Medium" HorizontalOptions="FillAndExpand" />
                 <Entry Placeholder="Enter the ammount" x:Name="ammount" Keyboard="Numeric"/>
             </StackLayout>
-            <Button x:Name="topUpButton" Text="Top Up" Clicked="OnTopUpClicked" />
-            <Button x:Name="topDownButton" Text="Top Down" Clicked="OnTopDownClicked" />
+            <StackLayout Orientation="Horizontal" Margin="0, 20, 0, 0">
+                <Button x:Name="topUpButton" Text="Add To Wallet" Clicked="OnTopUpClicked" 
+                HorizontalOptions="Start" />
+                <Button x:Name="topDownButton" Text="Remove From Wallet" Clicked="OnTopDownClicked" 
+                HorizontalOptions="EndAndExpand" />
+            </StackLayout>
+            <Button x:Name="dismiss" Text="Dismiss" Clicked="OnDismiss" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

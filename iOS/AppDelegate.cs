@@ -14,6 +14,8 @@ namespace TWallet.iOS
         {
             global::Xamarin.Forms.Forms.Init();
 
+            UIApplication.SharedApplication.SetStatusBarStyle(UIStatusBarStyle.LightContent, true);
+
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
