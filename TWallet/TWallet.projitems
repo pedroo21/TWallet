@@ -32,8 +32,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modals\AddCurrency.xaml.cs">
       <DependentUpon>AddCurrency.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Models\CurrencyEnum.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Root.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\IFileHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\Currencies.xaml.cs">
       <DependentUpon>Currencies.xaml</DependentUpon>
@@ -41,9 +39,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Account.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Currency.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TWalletDatabase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Account.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Currency.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Credit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\RootCurrency.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\CurrencyEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurrencyManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\CurrencySymbolEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)API\" />

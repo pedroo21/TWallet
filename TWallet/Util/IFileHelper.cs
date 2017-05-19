@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace TWallet
 {
 	public interface IFileHelper

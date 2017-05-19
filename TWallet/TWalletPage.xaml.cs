@@ -1,5 +1,6 @@
 ﻿using Xamarin.Forms;
 using TWallet.Views;
+using TWallet.Models;
 
 namespace TWallet
 {

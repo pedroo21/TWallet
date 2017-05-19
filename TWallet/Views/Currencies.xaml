@@ -9,20 +9,22 @@
     </ContentPage.Padding>
     <ContentPage.Content>
         <StackLayout>
-            <Label x:Name="cash" Text="0" TextColor="Black" XAlign="Center" FontSize="40">
+            <Label x:Name="cash" TextColor="Black" XAlign="Center" FontSize="40">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTapGesture" NumberOfTapsRequired="2" />
                 </Label.GestureRecognizers>
             </Label>
+            <Label x:Name="cash_empty" Text="You don't have any currency. Add a new one?" 
+                TextColor="Black" XAlign="Center" YAlign="Center" FontSize="10" />
             <ListView x:Name="currency_list" RowHeight="50" Margin="0, 40, 0, 0">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <StackLayout Orientation="Vertical" Margin="15, 5, 0, 5">
                                 <StackLayout Orientation="Horizontal">
-                                    <Image Source="{Binding Image}" />
-                                    <Label TextColor="Black" Margin="5, 0, 0, 0" Text="{Binding CurrencyDescription}"/>
-                                    <Label TextColor="Black" Margin="15, 0, 0, 0" Text="{Binding CurrencyConverted}" HorizontalOptions="EndAndExpand"/>
+                                    <Image Source="{Binding CurrencyImg}" />
+                                    <Label TextColor="Black" Margin="5, 0, 0, 0" Text="{Binding Currency}"/>
+                                    <Label TextColor="Black" Margin="15, 0, 0, 0" Text="{Binding Amount}" HorizontalOptions="EndAndExpand"/>
                                 </StackLayout>
                            </StackLayout>
                         </ViewCell>
