@@ -52,7 +52,7 @@ namespace TWallet.Views
         // Initialize the listing
         async void PrepareCurrencies()
         {
-            account = await App.Database.GetAccount();
+            account = App.Database.GetAccount();
 			if (account.Credits.Count == 0)
 			{
 				list.IsVisible = false;
@@ -64,11 +64,13 @@ namespace TWallet.Views
 				Label empty = this.FindByName<Label>("cash_empty");
 				empty.IsVisible = false;
             }
-            if (IsInternetAvailable())
-            {
-                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
-            }
+            await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
             GetCurrenciesFromDatabase();
+
+            if(CurrencyManager.GetCurrencies().Count <= 0)
+            {
+                return; // no connection
+            }
         }
 
         // Double tap gesture on the wallet total
@@ -78,18 +80,27 @@ namespace TWallet.Views
             if (cur != null)
             {
                 account.RootCurrency = cur.CurrencyKey;
-                await App.Database.InsertOrReplaceAccount(account);
+                App.Database.InsertOrReplaceAccount(account);
+                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
             }
             OnAppearing();
 		}
 
         // Get all cached currencies from the database
-		async void GetCurrenciesFromDatabase()
+		void GetCurrenciesFromDatabase()
 		{
-            await CurrencyManager.Init();
+            bool dbSetup = CurrencyManager.Init(account.RootCurrency);
+            if (!dbSetup)
+            {
+                // launch activity saying internet is required
+                return;
+            }
 			foreach (var item in account.Credits)
 			{
-				this.credits.Add(item);
+                if (!this.credits.Contains(item))
+                {
+                    this.credits.Add(item);
+                }
 			}
             this.currency_list.ItemsSource = this.credits;
             this.currency_list.HasUnevenRows = true;
@@ -114,38 +125,16 @@ namespace TWallet.Views
             this.cash.Text = cashDisplay.ToString("0.00 ") + account.RootCurrency;
 		}
 
-		string ConvertTo(double currency, string toType)
+		string ConvertTo(double amount, string toType)
 		{
-            if (CurrencyManager.GetCurrency(toType) != null)
+            Currency currency;
+            if ((currency = CurrencyManager.GetCurrency(toType)) != null)
             {
                 double rate = CurrencyManager.GetCurrency(toType).CurrencyValue;
-                double result = currency * rate;
-                return result.ToString("0.00 ") + toType;
+                double result = amount * rate;
+                return result.ToString("0.00 ") + currency.CurrencySymbol;
             }
             return "";
-		}
-
-		bool IsInternetAvailable()
-		{
-			string CheckUrl = "http://google.com";
-
-			try
-			{
-				HttpWebRequest iNetRequest = (HttpWebRequest)WebRequest.Create(CheckUrl);
-
-				iNetRequest.Timeout = 5000;
-
-				WebResponse iNetResponse = iNetRequest.GetResponse();
-
-				iNetResponse.Close();
-
-				return true;
-
-			}
-			catch (WebException)
-			{
-                return false;
-			}
 		}
 	}
 }

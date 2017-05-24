@@ -44,15 +44,27 @@ namespace TWallet.Models
             return Currencies.Values.ToList();    
         }
 
-        public static async Task Init()
+        public static bool Init(string baseCurrency)
         {
             ClearCurrencies();
 			List<Currency> cachedCurrencies = new List<Currency>();
-			cachedCurrencies = await App.Database.GetCurrencies();
-			foreach (var item in cachedCurrencies)
-			{
-				SetCurrency(item.CurrencyKey, item);
-			}
+			cachedCurrencies = App.Database.GetCurrencies();
+            if (cachedCurrencies.Count > 0)
+            {
+                foreach (var item in cachedCurrencies)
+                {
+                    SetCurrency(item.CurrencyKey, item);
+                }
+                if (GetCurrency(baseCurrency) == null)
+                {
+                    SetCurrency(baseCurrency, new Currency(baseCurrency, 1.0));
+                }
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
         }
 
         public static void ClearCurrencies()

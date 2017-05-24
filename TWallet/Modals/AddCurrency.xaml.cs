@@ -25,11 +25,6 @@ namespace TWallet.Modals
 
         void InitializeData() {
             List<Currency> currencies = CurrencyManager.GetCurrencies();
-            currencies.Add(new Currency() 
-            {
-                CurrencyKey = "EUR",
-                CurrencyValue = 1.0000000
-            });
             picker.ItemsSource = currencies;
         }
 
@@ -39,13 +34,13 @@ namespace TWallet.Modals
 
             if (currency != null)
             {
-				if (Double.TryParse(this.ammount.Text, out double ammount))
+				if (Double.TryParse(this.amount.Text, out double amount))
 				{
                     //double exchangeRateToEur = 1 / currency.CurrencyValue;
                     //double ammountToAdd = ammount * exchangeRateToEur;
 
-                    Account account = await App.Database.GetAccount();
-                    account.AddCredits(currency.CurrencyKey, ammount);
+                    Account account = App.Database.GetAccount();
+                    account.AddCredits(currency.CurrencyKey, amount);
 
                     App.Database.UpdateCredits(account.Credits);
 				}
@@ -60,12 +55,10 @@ namespace TWallet.Modals
 
 			if (currency != null)
 			{
-				if (Double.TryParse(this.ammount.Text, out double ammount))
+                if (Double.TryParse(this.amount.Text, out double amount))
 				{
-					double exchangeRateToEur = 1 / currency.CurrencyValue;
-					double ammountToRemove = ammount * exchangeRateToEur;
-
-					Account account = await App.Database.GetAccount();
+					Account account = App.Database.GetAccount();
+                    account.RemoveCredits(currency.CurrencyKey, amount);
                     //account.CreditsDb -= ammountToRemove;
 
 					App.Database.UpdateCredits(account.Credits);
