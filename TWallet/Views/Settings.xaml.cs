@@ -8,6 +8,7 @@ namespace TWallet.Views
 {
 	public partial class Settings : ContentPage
 	{
+        Account account;
         Picker picker;
 
 		public Settings()
@@ -22,9 +23,10 @@ namespace TWallet.Views
 			picker = this.FindByName<Picker>("currency_picker");
 		}
 
-		async void InitializeData()
+		void InitializeData()
 		{
-            await CurrencyManager.Init();
+            account = App.Database.GetAccount();
+            CurrencyManager.Init(account.RootCurrency);
 			List<Currency> currencies = CurrencyManager.GetCurrencies();
 			picker.ItemsSource = currencies;
 		}
@@ -35,9 +37,9 @@ namespace TWallet.Views
 
             if (currency != null)
             {
-                Account account = await App.Database.GetAccount();
                 account.RootCurrency = currency.CurrencyKey;
-                await App.Database.InsertOrReplaceAccount(account);
+                App.Database.InsertOrReplaceAccount(account);
+                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
             }
         }
 	}

@@ -44,11 +44,16 @@ namespace TWallet
 
         public void RemoveCredits(string currencyKey, double amount) {
             int index = Credits.FindIndex(x => x.Currency == currencyKey);
-            if(Credits[index].Amount - amount <= 0) {
-                Credits.RemoveAll(x => x.Currency == currencyKey);
-            }
-            else {
-                Credits[index].Amount -= amount;
+            if (index != -1)
+            {
+                if (Credits[index].Amount - amount <= 0)
+                {
+                    Credits.RemoveAll(x => x.Currency == currencyKey);
+                }
+                else
+                {
+                    Credits[index].Amount -= amount;
+                }
             }
         }
 	}

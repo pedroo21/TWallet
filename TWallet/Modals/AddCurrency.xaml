@@ -13,7 +13,7 @@
             <Picker x:Name="currency_picker" Title="Pick currency" ItemDisplayBinding="{Binding CurrencyKey}" />  
             <StackLayout Orientation="Vertical" Margin="0, 20, 0, 0">
                 <Label Text="Amount" FontSize="Medium" HorizontalOptions="FillAndExpand" />
-                <Entry Placeholder="Enter the ammount" x:Name="ammount" Keyboard="Numeric"/>
+                <Entry Placeholder="Enter the ammount" x:Name="amount" Keyboard="Numeric"/>
             </StackLayout>
             <StackLayout Orientation="Horizontal" Margin="0, 20, 0, 0">
                 <Button x:Name="topUpButton" Text="Add To Wallet" Clicked="OnTopUpClicked" 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    x:Class="TWallet.Views.Rates"
+    Title="Rates">
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness" iOS="20,40,30,20" Android="20,20,20,20" />
+    </ContentPage.Padding>
+	<ContentPage.Content>
+        <StackLayout>
+            <Label x:Name="cash" TextColor="Black" Margin="0, 0, 0, 40" XAlign="Center" FontSize="40" />
+            <StackLayout Orientation="Vertical" Margin="0, 20, 0, 0">
+                <Label Text="Currency" FontSize="Medium" HorizontalOptions="FillAndExpand" />
+                <Picker x:Name="currency_picker" Title="Base Currency" ItemDisplayBinding="{Binding CurrencyKey}"
+                SelectedIndexChanged="OnIndexChanged"/>
+            </StackLayout>
+            <StackLayout Orientation="Vertical" Margin="0, 20, 0, 0">
+                <Label Text="Amount" FontSize="Medium" HorizontalOptions="FillAndExpand" />
+                <Entry Placeholder="Enter the amount" x:Name="amount" Keyboard="Numeric" 
+                TextChanged="OnChangeAmount"/>
+            </StackLayout>
+        </StackLayout>
+	</ContentPage.Content>
+</ContentPage>

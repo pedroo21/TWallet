@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:oxy="clr-namespace:OxyPlot.Xamarin.Forms;assembly=OxyPlot.Xamarin.Forms"
+    x:Class="TWallet.Views.Graphs"
+    Title="Overview">
+	<ContentPage.Content>
+        <oxy:PlotView x:Name="graph" Model="{Binding Model}" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" />
+	</ContentPage.Content>
+</ContentPage>
