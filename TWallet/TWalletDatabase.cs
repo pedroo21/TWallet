@@ -69,22 +69,22 @@ namespace TWallet
 
 		public async Task SaveCurrenciesToDatabase(string currency)
 		{
-			HttpClientHandler handler = new HttpClientHandler();
-			HttpResponseMessage response = await APIHandler.Get("http://api.fixer.io/latest?base=" + currency, handler);
-			if (response.IsSuccessStatusCode)
-			{
+            HttpClientHandler handler = new HttpClientHandler();
+            HttpResponseMessage response = await APIHandler.Get("http://api.fixer.io/latest?base=" + currency, handler);
+            if (response.IsSuccessStatusCode)
+            {
                 DeleteAllCurrencies();
 
-				Root rootCurrency = JsonConvert.DeserializeObject<Root>(await response.Content.ReadAsStringAsync());
-				foreach (var item in rootCurrency.rates)
-				{
+                Root rootCurrency = JsonConvert.DeserializeObject<Root>(await response.Content.ReadAsStringAsync());
+                foreach (var item in rootCurrency.rates)
+                {
                     Currency curr = new Currency(item.Key, item.Value);
                     Console.WriteLine("Saving " + item.Key + " " + item.Value);
-					App.Database.SaveCurrencies(curr);
-					curr = null;
-				}
+                    App.Database.SaveCurrencies(curr);
+                    curr = null;
+                }
                 CurrencyManager.Init(currency);
-			}
+            }
 		}
 	}
 }

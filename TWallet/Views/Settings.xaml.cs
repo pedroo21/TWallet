@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TWallet.Models;
 using Xamarin.Forms;
@@ -37,9 +38,13 @@ namespace TWallet.Views
 
             if (currency != null)
             {
-                account.RootCurrency = currency.CurrencyKey;
-                App.Database.InsertOrReplaceAccount(account);
-                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+                try
+                {
+                    await App.Database.SaveCurrenciesToDatabase(currency.CurrencyKey);
+                }
+                catch (HttpRequestException) { return; }
+				account.RootCurrency = currency.CurrencyKey;
+				App.Database.InsertOrReplaceAccount(account);
             }
         }
 	}

@@ -13,6 +13,7 @@ using TWallet.Modals;
 using TWallet.Util;
 
 using Xamarin.Forms;
+using System.Net.Http;
 
 namespace TWallet.Views
 {
@@ -64,7 +65,11 @@ namespace TWallet.Views
 				Label empty = this.FindByName<Label>("cash_empty");
 				empty.IsVisible = false;
             }
-            await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+            try
+            {
+                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+            }
+            catch(HttpRequestException) { }
             GetCurrenciesFromDatabase();
 
             if(CurrencyManager.GetCurrencies().Count <= 0)
@@ -81,7 +86,11 @@ namespace TWallet.Views
             {
                 account.RootCurrency = cur.CurrencyKey;
                 App.Database.InsertOrReplaceAccount(account);
-                await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+                try
+                {
+                    await App.Database.SaveCurrenciesToDatabase(account.RootCurrency);
+                }
+                catch(HttpRequestException) { }
             }
             OnAppearing();
 		}
