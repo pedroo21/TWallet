@@ -5,6 +5,7 @@ using Xamarin.Forms;
 using OxyPlot.Xamarin.Forms;
 using OxyPlot;
 using OxyPlot.Series;
+using TWallet.Models;
 
 namespace TWallet.Views
 {
@@ -34,7 +35,10 @@ namespace TWallet.Views
 
 			foreach (var credit in account.Credits)
 			{
-				plotSeries.Slices.Add(new PieSlice(credit.Currency, credit.Amount) { IsExploded = false });
+                plotSeries.Slices.Add(new PieSlice(credit.Currency, ConvertTo(credit.Amount, credit.Currency)) 
+                { 
+                    IsExploded = false 
+                });
 			}
 
 			plot.Series.Add(plotSeries);
@@ -43,6 +47,18 @@ namespace TWallet.Views
 			view.Model = plot;
             plot.InvalidatePlot(true);
         }
+
+		double ConvertTo(double amount, string toType)
+		{
+			Currency currency;
+			if ((currency = CurrencyManager.GetCurrency(toType)) != null)
+			{
+				double rate = CurrencyManager.GetCurrency(toType).CurrencyValue;
+				double result = amount * rate;
+                return result;
+			}
+			return 0;
+		}
 
 		public PlotModel Plot
 		{
